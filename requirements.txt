@@ -1,0 +1,3 @@
+# hvplot  # plotting library used by Polars
+jupyter  # for running the notebook
+polars[plot]  # lightning-fast dataframe library, along with hvplot
