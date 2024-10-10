@@ -382,7 +382,7 @@ def __(df, mo, pl):
                 query_plan = (
                     df.filter(pl.col("tpep_pickup_datetime").dt.month() <= 3)
                     .group_by(
-                        by=pl.col("tpep_pickup_datetime").dt.strftime("%Y-%m").alias("month")
+                        month=pl.col("tpep_pickup_datetime").dt.strftime("%Y-%m")
                     )
                     .agg(
                         num_trips=pl.len(),  # count the number of trips
@@ -416,9 +416,7 @@ def __(df, mo, pl):
 
     query_plan = (
         df.filter(pl.col("tpep_pickup_datetime").dt.month() <= 3)
-        .group_by(
-            by=pl.col("tpep_pickup_datetime").dt.strftime("%Y-%m").alias("month")
-        )
+        .group_by(month=pl.col("tpep_pickup_datetime").dt.strftime("%Y-%m"))
         .agg(
             num_trips=pl.len(),  # count the number of trips
             cost_per_trip=pl.col("total_amount").mean(),
@@ -443,15 +441,14 @@ def __(mo, pl, query_plan):
         ### Collect the data
 
         ```python
-        df_avg = query_plan.collect()
+        df_avg = query_plan.collect().sort(by=pl.col("month"))
         ```
 
         Some options to `.collect()`: engine="cpu", streaming=False, background=False
         """
     )
 
-    df_avg = query_plan.collect()
-
+    df_avg = query_plan.collect().sort(by=pl.col("month"))
 
     with pl.Config(tbl_cols=20, tbl_width_chars=1000, thousands_separator=True):
         _output = mo.plain_text(df_avg)
