@@ -1,0 +1,23 @@
+[project]
+name = "polars-intro"
+version = "0.1.0"
+description = "A quick demo introducing the polars dataframe library through a marimo notebook."
+readme = "README.md"
+authors = [
+    { name = "Ryan Parker", email = "ryanparker.ml@gmail.com" } 
+]
+requires-python = ">=3.11"
+dependencies = [
+    "httpx>=0.27.2",
+    "marimo>=0.9.4",
+    # next-generation reactive notebook and app
+    "polars[plot]>=1.9.0",
+    # lightning-fast dataframe library, along with altair for plotting
+]
+
+[project.scripts]
+polars-intro = "polars_intro:main"
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
