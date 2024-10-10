@@ -29,7 +29,7 @@ async def __(mo):
     from pathlib import Path
 
     import polars as pl
-    from polars_intro import download_data
+    import download_data
 
     # Download data
     if not Path("data/").exists:
@@ -41,20 +41,22 @@ async def __(mo):
 
 @app.cell(hide_code=True)
 def __(mo):
-    mo.md(r"""
-    # Data analysis in Python
-    As an interpreted language with an easy-to-read syntax, Python is fantastic for data analysis, where rapid iteration enables exploration and accelerates development.
+    mo.md(
+        r"""
+        # Data analysis in Python
+        As an interpreted language with an easy-to-read syntax, Python is fantastic for data analysis, where rapid iteration enables exploration and accelerates development.
 
-    Since its first release in 2008, [pandas](https://pandas.pydata.org/docs/) has been the de-facto standard for data analysis in Python, but in recent years other libraries have been created which offer distinct advantages. Some of those include:
+        Since its first release in 2008, [pandas](https://pandas.pydata.org/docs/) has been the de-facto standard for data analysis in Python, but in recent years other libraries have been created which offer distinct advantages. Some of those include:
 
-    - [cuDF](https://docs.rapids.ai/api/cudf/stable/): GPU-accelerated dataframe operations with pandas API support
-    - [modin](https://modin.readthedocs.io/en/stable/): pandas API running on distributed compute using [Ray](https://www.ray.io/) or [Dask](https://www.dask.org/) as a backend
-    - [ibis](https://ibis-project.org/): dataframe library supporting dozens of backends (including pandas, polars, DuckDB, and many SQL databases)
-    - [DuckDB](https://duckdb.org/): in-process database engine for running SQL queries on local or remote data
-    - [temporian](https://temporian.readthedocs.io/en/stable/): efficient data processing for timeseries data
-    - [polars](https://pola.rs/): ultra-fast dataframe library written in Rust
-    - and others...
-    """)
+        - [cuDF](https://docs.rapids.ai/api/cudf/stable/): GPU-accelerated dataframe operations with pandas API support
+        - [modin](https://modin.readthedocs.io/en/stable/): pandas API running on distributed compute using [Ray](https://www.ray.io/) or [Dask](https://www.dask.org/) as a backend
+        - [ibis](https://ibis-project.org/): dataframe library supporting dozens of backends (including pandas, polars, DuckDB, and many SQL databases)
+        - [DuckDB](https://duckdb.org/): in-process database engine for running SQL queries on local or remote data
+        - [temporian](https://temporian.readthedocs.io/en/stable/): efficient data processing for timeseries data
+        - [polars](https://pola.rs/): ultra-fast dataframe library written in Rust
+        - and others...
+        """
+    )
     return
 
 
@@ -69,7 +71,7 @@ def __(mo):
         - Built on the Apache Arrow in-memory data format: enables zero-copy interoperability with other libraries (e.g., DuckDB, Snowflake)
         - Handles datasets larger than RAM
         - Powerful query optimizer
-        - Fully compatible with scikit-learn, thanks to the [Dataframe Interchange Protocol](https://data-apis.org/dataframe-protocol/latest/)
+        - Fully compatible with scikit-learn and a growing ecosystem of other libraries, thanks to the [Dataframe Interchange Protocol](https://data-apis.org/dataframe-protocol/latest/) and [narwhals](https://github.com/narwhals-dev/narwhals)
 
         - <img src="https://www.rust-lang.org/static/images/rust-logo-blk.svg" width=30 style="display: inline; vertical-align: middle;"> written in [Rust](https://rust-lang.org), a compiled language that has experienced rapid adoption since its first stable release in 2015 thanks to its C/C++ performance, concurrency, and memory safety
         """
@@ -82,10 +84,10 @@ def __(mo):
     mo.md(
         r"""
         # Key concepts
-        
+
         Polars uses the Apache Arrow in-memory data format, which is column-oriented. The primary data structures for polars are Series and DataFrames, similar to pandas.
-        
-        - Apache Arrow supports many useful data types (many more than those which are supported by NumPy), so you can perform fast, vectorized operations on all kinds of data (nested JSON `structs`, strings, datetimes, etc.)
+
+        Apache Arrow supports many useful data types (many more than those which are supported by NumPy), so you can perform fast, vectorized operations on all kinds of data (nested JSON `structs`, strings, datetimes, etc.)
         """
     )
     return
@@ -97,20 +99,20 @@ def __(mo):
         r"""
         ## Contexts
         In Polars, a _context_ refers to the data available to operate on.
-        
+
         The primary contexts are:
-        
+
         **Selection**:
-        
+
         - `.select()`: choose a subset of columns and perform operations on them
         - `.with_columns()`: add to the columns already available
-        
+
         **Filtering**:
-        
+
         - `.filter()`: filter the data using boolean conditions on row values
-        
+
         **Aggregation**:
-        
+
         - `.group_by()`: perform aggregations on groups of values
         """
     )
@@ -164,7 +166,7 @@ def __(mo):
                     "### [`polars_ds`](https://github.com/abstractqqq/polars_ds_extension)": (
                         r"""
                         Polars extension for data science tasks
-                        
+
                         - A combination of functions and operations from scikit-learn, SciPy, and edit distance
                         - Polars is the only dependency (unless you want to create plots; that adds Plotly as a dependency)
                         - Can create bar plots within dataframe outputs (HTML `__repr__` in a notebook) -- like sparklines, and similar to what is available in pandas' advanced dataframe styling options
@@ -281,50 +283,137 @@ def __(mo):
         r"""
         ## Lazy-load the data
         Polars can read Parquet files (local or hosted on a network), determine their schema (columns and data types), apply filter pushdowns, and download only the data that is needed for the operations being performed.
+
+        ```python
+        import polars as pl
+
+        # Create a dataframe from a collection of parquet files
+        df = pl.scan_parquet("data/yellow_tripdata_*.parquet)
+        ```
         """
     )
     return
 
 
 @app.cell
-def __(get_data_urls, pl):
+def __(mo, pl):
+    _md = mo.md(
+        """
+        Let's check the schema:
+
+        ```python
+        # Polars will scan the data and return
+        # the column names and datatypes
+        df.collect_schema()
+
+        # If the file is stored locally, you can
+        # also read the schema without collecting fist
+        pl.read_parquet_schema("path/to/a/local/file.parquet")
+        ```
+        """
+    )
+
     # Create a LazyFrame that will use the data from all the files specified above
-    df = pl.scan_parquet(get_data_urls())
+    df = pl.scan_parquet("data/yellow_tripdata_*.parquet")
+    _output = mo.plain(df.collect_schema())
+    mo.vstack([_md, _output])
     return (df,)
 
 
 @app.cell
-def __(df):
-    # Find out what columns are available and their data types
-    df.collect_schema()
+def __(df, mo, pl):
+    _md = mo.md(
+        """
+        **Preview the first few rows:**
 
-    # If this were a local Parquet file, you could get just the schema
-    # without reading data:
-    # pl.read_parquet_schema("path/to/a/local/file.parquet")
+        ```python
+        df.head(n=10)
+        ```
+        """
+    )
+
+    with pl.Config(tbl_cols=20, tbl_width_chars=1000, thousands_separator=True):
+        _output = mo.plain_text(df.head(n=10).collect())
+
+    mo.vstack([_md, _output])
     return
 
 
 @app.cell
-def __():
-    # Preview the first few rows.
+def __(df, mo, pl):
+    _md = mo.md(
+        """
+        **You can also preview the first few rows like this:**
 
-    # This is a somewhat expensive operation, since all files will need to be
-    # queried.
-    # df.head().collect()
+        ```python
+        df.collect().glimpse()
+        ```
+        """
+    )
 
-    # With an in-memory DataFrame, you can run: df.glimpse() for a more compact
-    # view.
+    with pl.Config(tbl_cols=20, tbl_width_chars=1000, thousands_separator=True):
+        _output = mo.plain_text(df.collect().glimpse())
+
+    mo.vstack([_md])
     return
 
 
 @app.cell
-def __(df, pl):
-    # Find the average cost per trip, by month
-    # Note that the operations below are performed in parallel across
-    # all available CPU cores, and that only the data needed will be downloaded.
-    # In this case, since I have filtered to 3 months, only those months of data
-    # will be downloaded. Also notice that only 5 columns will be downloaded, since
-    # those are the ones I have requested.
+def __(df, mo, pl):
+    _md = mo.md(
+        """
+        ## Explore the data
+
+        **Find the average cost per trip, by month**
+
+        Note that the operations below are performed in parallel across all available CPU cores, and that only the data needed will be downloaded.
+
+        In this case, since I have filtered to 3 months, only the files with those months of data will be accessed. Also notice that only 5 columns are accessed, since those are the ones I have requested.
+        """
+    )
+
+    _accordion = mo.accordion(
+        {
+            "Here's a way we could answer this question in Polars": mo.md(
+                r""" 
+                Let's see this in Polars:
+                
+                ```python
+                query_plan = (
+                    df.filter(pl.col("tpep_pickup_datetime").dt.month() <= 3)
+                    .group_by(
+                        by=pl.col("tpep_pickup_datetime").dt.strftime("%Y-%m").alias("month")
+                    )
+                    .agg(
+                        num_trips=pl.len(),  # count the number of trips
+                        cost_per_trip=pl.col("total_amount").mean(),
+                        avg_passengers_per_trip=pl.col("passenger_count").mean(),
+                        avg_distance=pl.col("trip_distance").mean(),
+                        num_airport_trips=(pl.col("Airport_fee") > 0).sum(),
+                    )
+                )
+                ```
+                """
+            ),
+            "Let's see how Polars will optimize this query": mo.md(
+                r"""
+                ```python
+                # This is what Polars will execute
+                query_plan.explain()
+                ```
+                """
+            ),
+            "You can also run this in streaming mode for memory-constrained environments": mo.md(
+                r"""
+                ```python
+                query_plan.explain(streaming=True)
+                ```
+                """
+            ),
+        }
+    )
+
+
     query_plan = (
         df.filter(pl.col("tpep_pickup_datetime").dt.month() <= 3)
         .group_by(
@@ -339,33 +428,36 @@ def __(df, pl):
         )
     )
 
-    # See what Polars will execute
-    print(query_plan.explain())
+    _output = mo.plain_text(query_plan.explain())
+    _md2 = mo.md("**Here's the streaming version:**")
+    _output_with_streaming = mo.plain_text(query_plan.explain(streaming=True))
 
-    # You could also run this in streaming mode for memory-constrained systems
-    # print(
-    #     "\n",
-    #     " Query plan with streaming mode ".center(80, "-"),
-    #     query_plan.explain(streaming=True),
-    #     sep="",
-    # )
+    mo.vstack([_md, _accordion, _output, _md2, _output_with_streaming])
     return (query_plan,)
 
 
 @app.cell
-def __(query_plan):
-    # Now, run the query. This uses ~150MB of data transfer.
-    # Some options to .collect(): engine="cpu", streaming=False, background=False
+def __(mo, pl, query_plan):
+    _md = mo.md(
+        r"""
+        ### Collect the data
+
+        ```python
+        df_avg = query_plan.collect()
+        ```
+
+        Some options to `.collect()`: engine="cpu", streaming=False, background=False
+        """
+    )
+
     df_avg = query_plan.collect()
 
-    df_avg
+
+    with pl.Config(tbl_cols=20, tbl_width_chars=1000, thousands_separator=True):
+        _output = mo.plain_text(df_avg)
+
+    mo.vstack([_md, _output])
     return (df_avg,)
-
-
-@app.cell
-def __(pl):
-    pl.read_parquet("data/yellow_tripdata_2024-01.parquet").head()
-    return
 
 
 @app.cell
