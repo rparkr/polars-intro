@@ -627,7 +627,7 @@ def __(df, pl):
     )
 
     # Combine with the Taxi data
-    # For an join_asof, both DataFrames need to
+    # for a join_asof, both DataFrames need to
     # be sorted by the join_asof key
     df_combined = df.sort("tpep_pickup_datetime").join_asof(
         df_weather,
@@ -641,7 +641,7 @@ def __(df, pl):
 
 
 @app.cell
-def __(df_combined, df_weather, mo, weather_codes_dict, weather_data_dict):
+def __(df_combined, df_weathe, mo, weather_codes_dict, weather_data_dict):
     _md = mo.md(
         r"""
         ## How does weather impact trips?
@@ -682,11 +682,11 @@ def __(df_combined, df_weather, mo, weather_codes_dict, weather_data_dict):
                 ```
                 """
             ),
-            "Here's what the data looks like": df_weather.collect(),
+            "Here's what the data looks like": df_weathe.head(100).collect(),
             "Combine with the Taxi trips data": (
                 """
                 ```python
-                # For an join_asof, both DataFrames need to
+                # for a join_asof, both DataFrames need to
                 # be sorted by the join_asof key
                 df_combined = df.sort("tpep_pickup_datetime").join_asof(
                     df_weather,
