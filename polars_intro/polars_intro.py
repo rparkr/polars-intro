@@ -20,7 +20,7 @@ def __(mo):
 
         Created by: [Ryan Parker](https://github.com/rparkr), August 2024. Last updated in October 2024.
 
-        This demo is a [marimo notebook](https://marimo.io/), so it is interactive and reactive -- trying experimenting with the widgets later on!
+        This demo is a [marimo notebook](https://marimo.io/), so it is interactive and reactive -- try experimenting with the widgets later on!
         """
     )
     return
@@ -641,7 +641,7 @@ def __(df, pl):
 
 
 @app.cell
-def __(df_combined, df_weathe, mo, weather_codes_dict, weather_data_dict):
+def __(df_combined, df_weather, mo, weather_codes_dict, weather_data_dict):
     _md = mo.md(
         r"""
         ## How does weather impact trips?
@@ -682,7 +682,7 @@ def __(df_combined, df_weathe, mo, weather_codes_dict, weather_data_dict):
                 ```
                 """
             ),
-            "Here's what the data looks like": df_weathe.head(100).collect(),
+            "Here's what the data looks like": df_weather.head(100).collect(),
             "Combine with the Taxi trips data": (
                 """
                 ```python
