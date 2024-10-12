@@ -39,7 +39,7 @@ def get_data_urls(year: int = None, **kwargs) -> list[str]:
     return data_urls
 
 
-async def download_data(
+async def download_taxi_data(
     urls: list[str] | None = None, save_dir: str = "data", **kwargs
 ) -> None:
     """
@@ -196,11 +196,41 @@ def download_weather_data(
 
     with open(filepath, mode="wt", encoding="utf8") as data_file:
         data_file.write(response.text)
+    print(f"Saved weather data to: {filepath}")
     return str(filepath)
+
+
+def download_weather_codes(save_dir: str = "data") -> str:
+    """
+    Download WMO weather interpretation codes from: https://gist.github.com/stellasphere/9490c195ed2b53c707087c8c2db4ec0c
+
+    Parameters
+    ----------
+    save_dir: str, default = "data"
+        The directory (relative to the current working directory)
+        where the data will be saved.
+
+    Returns
+    -------
+    str: filepath to downloaded data
+    """
+    url = "https://gist.githubusercontent.com/stellasphere/9490c195ed2b53c707087c8c2db4ec0c/raw/76b0cb0ef0bfd8a2ec988aa54e30ecd1b483495d/descriptions.json"
+    filepath = Path(save_dir) / "weather_codes.json"
+
+    response = httpx.get(url)
+
+    with open(filepath, mode="wt", encoding="utf8") as data_file:
+        data_file.write(response.text)
+    print(f"Saved weather codes to: {filepath}")
+    return str(filepath)
+
+
+def download_all():
+    asyncio.run(download_taxi_data())
+    _ = download_weather_data()
+    _ = download_weather_codes()
 
 
 # Download data
 if __name__ == "__main__":
-    asyncio.run(download_data())
-    weather_file = download_weather_data()
-    print(f"Saved weather data to: {weather_file}")
+    download_all()

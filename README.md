@@ -1,6 +1,9 @@
 # Intro to [polars](https://pola.rs)
 A short demo to introduce the polars dataframe library.
 
+> [!NOTE]
+> You can also [view a static version of this notebook from your browser](https://rparkr.github.io/polars-intro/).
+
 # Getting started
 1. Clone the repo and move into the folder
 
