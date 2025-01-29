@@ -4,10 +4,9 @@ Asynchronously download data used in this tutorial.
 
 import asyncio
 import datetime as dt
-from pathlib import Path
 import urllib.parse
+from pathlib import Path
 from zoneinfo import ZoneInfo
-
 
 import httpx
 
@@ -18,18 +17,19 @@ def get_data_urls(year: int = None, **kwargs) -> list[str]:
     """Get the URLs for all months of Yellow Taxi data in a given year."""
     if not year:
         year = dt.date.today().year
-    current_year = dt.date.today().year
-    assert (year >= 2009) and (
-        year <= current_year
-    ), f"year must be >= 2009 and <= {current_year}, but {year} was given"
-    end_month = 12
-    if year == current_year:
-        if dt.date.today().month <= 3:
+    today = dt.date.today()
+    assert (year >= 2009) and (year <= today.year), (
+        f"year must be >= 2009 and <= {today.year}, but {year} was given"
+    )
+    if year == today.year:
+        if today.month <= 3:
             print(
                 "The current year was requested, but data may not yet "
-                f"be available. Using last year ({current_year - 1}) instead."
+                f"be available. Using last year ({today.year - 1}) instead."
             )
-            year = current_year - 1
+            year = today.year - 1
+            # If today is Jan set to Oct; if Feb set to Nov; if Mar set to Dec
+            end_month = today.month + 9
         else:
             end_month = dt.date.today().month - 3
     data_urls = [
@@ -90,7 +90,7 @@ async def download_taxi_data(
     max_digits = len(str(total_files))
     for i, result in enumerate(results):
         print(
-            f"{i+1:>0{max_digits}}/{total_files:>0{max_digits}} | Downloaded file: {result}"
+            f"{i + 1:>0{max_digits}}/{total_files:>0{max_digits}} | Downloaded file: {result}"
         )
 
 
@@ -165,6 +165,10 @@ def download_weather_data(
     - [Open-Meteo's license]()
     - [Open-Meteo's historical data API docs](https://open-meteo.com/en/docs/historical-weather-api)
     """
+    # If the start date is within the first three months of the year,
+    # set the date range to the previous year; otherwise, set the range to
+    # the current year. This aligns with the data publishing timelines for
+    # the NYC Yellow Taxi dataset.
     today = dt.date.today()
     if not start_date:
         if today.month >= 3:

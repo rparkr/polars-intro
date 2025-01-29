@@ -1,15 +1,11 @@
 import marimo
 
-__generated_with = "0.9.7"
-app = marimo.App(
-    app_title="Polars intro",
-    layout_file="layouts/polars_intro.slides.json",
-    css_file="../custom.css",
-)
+__generated_with = "0.10.15"
+app = marimo.App(app_title="Polars intro", css_file="../custom.css")
 
 
 @app.cell
-def __(mo):
+def _(mo):
     mo.md(
         r"""
         # Intro to [polars](https://pola.rs)
@@ -27,7 +23,7 @@ def __(mo):
 
 
 @app.cell
-async def __(mo):
+async def _(mo):
     from pathlib import Path
 
     import polars as pl
@@ -47,7 +43,7 @@ async def __(mo):
 
 
 @app.cell(hide_code=True)
-def __(mo):
+def _(mo):
     mo.md(
         r"""
         # Data analysis in Python
@@ -68,7 +64,7 @@ def __(mo):
 
 
 @app.cell
-def __(mo):
+def _(mo):
     mo.md(
         rf"""
         # Polars advantages
@@ -87,7 +83,7 @@ def __(mo):
 
 
 @app.cell
-def __(mo):
+def _(mo):
     mo.md(
         r"""
         # Key concepts
@@ -101,7 +97,7 @@ def __(mo):
 
 
 @app.cell
-def __(mo):
+def _(mo):
     mo.md(
         r"""
         ## Contexts
@@ -127,7 +123,7 @@ def __(mo):
 
 
 @app.cell
-def __(mo):
+def _(mo):
     mo.md(
         r"""
         ## Expressions
@@ -145,7 +141,7 @@ def __(mo):
 
 
 @app.cell
-def __(mo):
+def _(mo):
     mo.md(
         r"""
         ## Lazy vs. Eager mode
@@ -159,7 +155,7 @@ def __(mo):
 
 
 @app.cell
-def __(mo):
+def _(mo):
     mo.vstack(
         [
             mo.md(
@@ -202,7 +198,7 @@ def __(mo):
 
 
 @app.cell
-def __(mo):
+def _(mo):
     mo.md(
         r"""
         # Final thoughts
@@ -218,7 +214,7 @@ def __(mo):
 
 
 @app.cell
-def __(mo):
+def _(mo):
     mo.md(
         r"""
         # Resources
@@ -232,7 +228,7 @@ def __(mo):
 
 
 @app.cell(hide_code=True)
-def __(mo):
+def _(mo):
     mo.vstack(
         [
             mo.md(r"""
@@ -285,7 +281,7 @@ def __(mo):
 
 
 @app.cell
-def __(mo):
+def _(mo):
     mo.md(
         r"""
         ## Lazy-load the data
@@ -303,7 +299,7 @@ def __(mo):
 
 
 @app.cell
-def __(mo, pl):
+def _(mo, pl):
     _md = mo.md(
         """
         Let's check the schema:
@@ -328,7 +324,7 @@ def __(mo, pl):
 
 
 @app.cell
-def __(df, mo, pl):
+def _(df, mo, pl):
     _md = mo.md(
         """
         **Preview the first few rows:**
@@ -347,7 +343,7 @@ def __(df, mo, pl):
 
 
 @app.cell
-def __(df, mo, pl):
+def _(df, mo, pl):
     _md = mo.md(
         """
         **You can also preview the first few rows like this:**
@@ -368,14 +364,14 @@ def __(df, mo, pl):
 
 
 @app.cell
-def __(df, pl):
+def _(df, pl):
     with pl.Config(thousands_separator=True):
         df.collect().glimpse()
     return
 
 
 @app.cell
-def __(df, mo, pl):
+def _(df, mo, pl):
     _month_list = (
         df.select(month=pl.col("tpep_pickup_datetime").dt.strftime("%Y-%m"))
         .group_by("month")
@@ -393,7 +389,7 @@ def __(df, mo, pl):
 
 
 @app.cell
-def __(df, mo, month_selection, pl):
+def _(df, mo, month_selection, pl):
     _md = mo.md(
         f"""
         ## Explore the data
@@ -473,7 +469,7 @@ def __(df, mo, month_selection, pl):
 
 
 @app.cell
-def __(mo, month_selection, pl, query_plan):
+def _(mo, month_selection, pl, query_plan):
     _md = mo.md(
         rf"""
         ### Perform the calculation ("collect")
@@ -498,7 +494,7 @@ def __(mo, month_selection, pl, query_plan):
 
 
 @app.cell
-def __(df, mo, month_selection, pl):
+def _(df, mo, month_selection, pl):
     _md = mo.md(
         f"""
         ## How does trip count vary by hour of the day?
@@ -563,7 +559,7 @@ def __(df, mo, month_selection, pl):
 
 
 @app.cell
-def __():
+def _():
     # Explore the weather codes:
     import json
 
@@ -576,7 +572,7 @@ def __():
 
 
 @app.cell
-def __(df, pl):
+def _(df, pl):
     # import polars.selectors as cs  # for "column selectors"
 
     # Load the weather codes data and convert to a LazyFrame
@@ -641,7 +637,7 @@ def __(df, pl):
 
 
 @app.cell
-def __(df_combined, df_weather, mo, weather_codes_dict, weather_data_dict):
+def _(df_combined, df_weather, mo, weather_codes_dict, weather_data_dict):
     _md = mo.md(
         r"""
         ## How does weather impact trips?
@@ -720,7 +716,7 @@ def __(df_combined, df_weather, mo, weather_codes_dict, weather_data_dict):
                         ]
                     )
                 ).lazy()  # must be a LazyFrame to join with another LazyFrame
-                
+
                 # Get the names of the weather variables, so their lists can be "exploded"
                 # down the rows of the LazyFrame
                 data_fields = (
@@ -741,7 +737,7 @@ def __(df_combined, df_weather, mo, weather_codes_dict, weather_data_dict):
 
 
 @app.cell
-def __(mo, weather_codes):
+def _(mo, weather_codes):
     weather_selection = mo.ui.multiselect.from_series(
         weather_codes.select("weather_description").collect().to_series(),
         label="",
@@ -751,7 +747,7 @@ def __(mo, weather_codes):
 
 
 @app.cell
-def __(df_combined, mo, pl, weather_selection):
+def _(df_combined, mo, pl, weather_selection):
     _md = mo.md(
         f"""
         ### How much does weather impact average cost?
@@ -834,7 +830,7 @@ def __(df_combined, mo, pl, weather_selection):
                     color="weather_description",
                     xOffset="weather_description",
                 )
-                
+
                 plot_line = result.collect().plot.line(
                     x="month",
                     y="num_trips",
@@ -853,7 +849,7 @@ def __(df_combined, mo, pl, weather_selection):
 
 
 @app.cell
-def __(mo):
+def _(mo):
     mo.md(
         """
         # Keep exploring!
@@ -864,7 +860,7 @@ def __(mo):
 
 
 @app.cell
-def __():
+def _():
     import marimo as mo
     return (mo,)
 
